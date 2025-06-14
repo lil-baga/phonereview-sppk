@@ -1,41 +1,33 @@
 {
-    "last_csv": "uploads\\test.csv",
+    "last_csv": "uploads\\smartphone_cleaned_v5.csv",
     "criteria": {
-        "battery_power": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "clock_speed": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "four_g": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "int_memory": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "mobile_wt": {
+        "price": {
             "type": "Cost",
+            "weight": 0.2
+        },
+        "has_5g": {
+            "type": "Benefit",
+            "weight": 0.05
+        },
+        "processor_speed": {
+            "type": "Benefit",
+            "weight": 0.05
+        },
+        "battery_capacity": {
+            "type": "Benefit",
+            "weight": 0.2
+        },
+        "ram_capacity": {
+            "type": "Benefit",
+            "weight": 0.25
+        },
+        "internal_memory": {
+            "type": "Benefit",
             "weight": 0.1
         },
-        "pc": {
+        "primary_camera_rear": {
             "type": "Benefit",
-            "weight": 0.2
-        },
-        "px_height": {
-            "type": "Benefit",
-            "weight": 0.05
-        },
-        "px_width": {
-            "type": "Benefit",
-            "weight": 0.05
-        },
-        "ram": {
-            "type": "Benefit",
-            "weight": 0.2
+            "weight": 0.15
         }
     }
 }
