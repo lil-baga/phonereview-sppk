@@ -110,7 +110,6 @@ def save_config(config):
 # BAGIAN 4: FLASK ROUTES (LOGIKA DIPERBARUI)
 # ---------------------------------------------------------------------------
 def paginate(df, page):
-    """Fungsi helper untuk paginasi DataFrame."""
     start = (page - 1) * ITEMS_PER_PAGE
     end = start + ITEMS_PER_PAGE
     return df.iloc[start:end]
@@ -119,7 +118,11 @@ def paginate(df, page):
 def dashboard():
     config = load_config()
     results = None
-    page = request.args.get('page', 1, type=int)
+    pratinjau_page = request.args.get('pratinjau_page', 1, type=int)
+    keputusan_page = request.args.get('keputusan_page', 1, type=int)
+    linguistik_page = request.args.get('linguistik_page', 1, type=int)
+    saw_page = request.args.get('saw_page', 1, type=int)
+    aras_page = request.args.get('aras_page', 1, type=int)
 
     if request.method == 'POST' and 'file' in request.files:
         file = request.files['file']
@@ -152,20 +155,48 @@ def dashboard():
                 linguistic_df = pd.DataFrame(linguistic_matrix, columns=selected_criteria, index=df_raw.index)
 
                 saw_scores, _ = fuzzy_saw(fuzzy_matrix, weights_list)
-                df_saw = pd.DataFrame({'Alternatif': df_raw.index, 'Skor Defuzzifikasi': saw_scores}).sort_values('Skor Defuzzifikasi', ascending=False)
+                df_saw = pd.DataFrame({
+                    'Nama HP': df_raw['model'],  # Ganti "Nama" jika nama kolom berbeda
+                    'Skor Defuzzifikasi': saw_scores
+                }).sort_values('Skor Defuzzifikasi', ascending=False)
                 df_saw['Peringkat'] = range(1, len(df_saw) + 1)
 
                 aras_scores, _ = fuzzy_aras(fuzzy_matrix, weights_list)
-                df_aras = pd.DataFrame({'Alternatif': df_raw.index, 'Derajat Utilitas Defuzzifikasi': aras_scores}).sort_values('Derajat Utilitas Defuzzifikasi', ascending=False)
+                df_aras = pd.DataFrame({
+                    'Nama HP': df_raw['model'],  # Sesuaikan juga nama kolomnya
+                    'Derajat Utilitas Defuzzifikasi': aras_scores
+                }).sort_values('Derajat Utilitas Defuzzifikasi', ascending=False)
                 df_aras['Peringkat'] = range(1, len(df_aras) + 1)
                 
                 results = {
-                    "pratinjau": {"data": paginate(df_raw, page), "page": page, "total_pages": ceil(len(df_raw)/ITEMS_PER_PAGE)},
-                    "keputusan": {"data": paginate(decision_matrix_df.reset_index(), page), "page": page, "total_pages": ceil(len(decision_matrix_df)/ITEMS_PER_PAGE)},
-                    "linguistik": {"data": paginate(linguistic_df.reset_index(), page), "page": page, "total_pages": ceil(len(linguistic_df)/ITEMS_PER_PAGE)},
-                    "saw": {"data": paginate(df_saw, page), "page": page, "total_pages": ceil(len(df_saw)/ITEMS_PER_PAGE)},
-                    "aras": {"data": paginate(df_aras, page), "page": page, "total_pages": ceil(len(df_aras)/ITEMS_PER_PAGE)},
+                    "pratinjau": {
+                        "data": paginate(df_raw, pratinjau_page),
+                        "page": pratinjau_page,
+                        "total_pages": ceil(len(df_raw) / ITEMS_PER_PAGE)
+                    },
+                    "keputusan": {
+                        "data": paginate(decision_matrix_df.reset_index(), keputusan_page),
+                        "page": keputusan_page,
+                        "total_pages": ceil(len(decision_matrix_df) / ITEMS_PER_PAGE)
+                    },
+                    "linguistik": {
+                        "data": paginate(linguistic_df.reset_index(), linguistik_page),
+                        "page": linguistik_page,
+                        "total_pages": ceil(len(linguistic_df) / ITEMS_PER_PAGE)
+                    },
+                    "saw": {
+                        "data": paginate(df_saw, saw_page),
+                        "page": saw_page,
+                        "total_pages": ceil(len(df_saw) / ITEMS_PER_PAGE)
+                    },
+                    "aras": {
+                        "data": paginate(df_aras, aras_page),
+                        "page": aras_page,
+                        "total_pages": ceil(len(df_aras) / ITEMS_PER_PAGE)
+                    },
                 }
+
+
         except Exception as e:
             flash(f"Terjadi error saat memproses file: {e}", "danger")
 

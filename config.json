@@ -1,8 +1,8 @@
 {
-    "last_csv": "uploads\\smartphone_cleaned_v5.csv",
+    "last_csv": "uploads\\sppk.csv",
     "criteria": {
         "price": {
-            "type": "Cost",
+            "type": "Benefit",
             "weight": 0.2
         },
         "has_5g": {
