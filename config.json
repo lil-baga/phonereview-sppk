@@ -1,41 +1,33 @@
 {
-    "last_csv": "uploads\\test.csv",
+    "last_csv": "uploads\\sppk.csv",
     "criteria": {
-        "battery_power": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "clock_speed": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "four_g": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "int_memory": {
-            "type": "Benefit",
-            "weight": 0.1
-        },
-        "mobile_wt": {
-            "type": "Cost",
-            "weight": 0.1
-        },
-        "pc": {
+        "price": {
             "type": "Benefit",
             "weight": 0.2
         },
-        "px_height": {
+        "has_5g": {
             "type": "Benefit",
             "weight": 0.05
         },
-        "px_width": {
+        "processor_speed": {
             "type": "Benefit",
             "weight": 0.05
         },
-        "ram": {
+        "battery_capacity": {
             "type": "Benefit",
             "weight": 0.2
+        },
+        "ram_capacity": {
+            "type": "Benefit",
+            "weight": 0.25
+        },
+        "internal_memory": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "primary_camera_rear": {
+            "type": "Benefit",
+            "weight": 0.15
         }
     }
 }
