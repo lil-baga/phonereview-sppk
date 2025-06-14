@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Fuzzy SAW-ARAS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap Icons CDN (tetap berguna untuk ikon) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script>
+        // Konfigurasi custom untuk Tailwind (opsional, untuk warna dll)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af', // Blue-800
+                        secondary: '#374151', // Gray-700
+                        light: '#f9fafb', // Gray-50
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Menggunakan font yang lebih modern */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-light text-secondary">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo / Brand -->
+                <div class="flex-shrink-0">
+                    <a class="flex items-center space-x-2 text-2xl font-bold text-primary" href="{{ url_for('dashboard') }}">
+                        <i class="bi bi-calculator"></i>
+                        <span>Fuzzy SAW-ARAS</span>
+                    </a>
+                </div>
+
+                <!-- Navigasi -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{{ url_for('dashboard') }}" 
+                        class="px-3 py-2 rounded-md text-sm font-medium 
+                                {% if current_page == 'dashboard' %} 
+                                    bg-blue-100 text-primary 
+                                {% else %} 
+                                    text-gray-600 hover:bg-gray-100 hover:text-gray-900 
+                                {% endif %}">
+                            <i class="bi bi-grid-1x2"></i> Dashboard
+                        </a>
+                        <a href="{{ url_for('settings') }}" 
+                        class="px-3 py-2 rounded-md text-sm font-medium 
+                                {% if current_page == 'settings' %} 
+                                    bg-blue-100 text-primary
+                                {% else %} 
+                                    text-gray-600 hover:bg-gray-100 hover:text-gray-900 
+                                {% endif %}">
+                            <i class="bi bi-gear"></i> Pengaturan
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobile-menu-button" type="button" class="bg-gray-100 inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-primary" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Buka menu utama</span>
+                        <i id="mobile-menu-icon" class="bi bi-list text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu, show/hide berdasarkan state -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{{ url_for('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if current_page == 'dashboard' %} bg-blue-100 text-primary {% else %} text-gray-600 hover:bg-gray-100 hover:text-gray-900 {% endif %}">Dashboard</a>
+                <a href="{{ url_for('settings') }}" class="block px-3 py-2 rounded-md text-base font-medium {% if current_page == 'settings' %} bg-blue-100 text-primary {% else %} text-gray-600 hover:bg-gray-100 hover:text-gray-900 {% endif %}">Pengaturan</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="space-y-3 mb-4">
+                {% for category, message in messages %}
+                    {% set bg_color = 'bg-blue-100 border-blue-400 text-blue-700' %}
+                    {% if category == 'success' %}{% set bg_color = 'bg-green-100 border-green-400 text-green-800' %}{% endif %}
+                    {% if category == 'warning' %}{% set bg_color = 'bg-yellow-100 border-yellow-400 text-yellow-800' %}{% endif %}
+                    {% if category == 'danger' %}{% set bg_color = 'bg-red-100 border-red-400 text-red-800' %}{% endif %}
+                    <div class="border-l-4 p-4 {{ bg_color }}" role="alert">
+                        <p class="font-bold">{{ category|capitalize }}</p>
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Konten Utama Halaman -->
+        <div class="px-4 py-6 sm:px-0">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="text-center text-gray-500 text-sm mt-8 py-4 border-t border-gray-200">
+        <p>&copy; 2024 Aplikasi SPK Fuzzy SAW-ARAS. Dibuat dengan Flask & Tailwind CSS.</p>
+    </footer>
+
+    <script>
+        // Script untuk toggle mobile menu
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenuIcon.classList.remove('bi-x');
+                mobileMenuIcon.classList.add('bi-list');
+            } else {
+                mobileMenuIcon.classList.remove('bi-list');
+                mobileMenuIcon.classList.add('bi-x');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+    "last_csv": "uploads\\test.csv",
+    "criteria": {
+        "battery_power": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "clock_speed": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "four_g": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "int_memory": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "mobile_wt": {
+            "type": "Cost",
+            "weight": 0.1
+        },
+        "pc": {
+            "type": "Benefit",
+            "weight": 0.2
+        },
+        "px_height": {
+            "type": "Benefit",
+            "weight": 0.05
+        },
+        "px_width": {
+            "type": "Benefit",
+            "weight": 0.05
+        },
+        "ram": {
+            "type": "Benefit",
+            "weight": 0.2
+        }
+    }
+}
