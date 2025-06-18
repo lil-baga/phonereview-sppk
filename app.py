@@ -81,7 +81,13 @@ def fuzzy_saw(fuzzy_matrix, weights):
     return [s.defuzzify() for s in final_scores], final_scores
 
 def fuzzy_aras(fuzzy_matrix, weights):
-    optimal_row = [TFN(1.0, 1.0, 1.0)] * len(weights)
+    optimal_row = []
+    for j in range(len(weights)):
+        col = [row[j] for row in fuzzy_matrix]
+        max_l = max(tfn.l for tfn in col)
+        max_m = max(tfn.m for tfn in col)
+        max_u = max(tfn.u for tfn in col)
+        optimal_row.append(TFN(max_l, max_m, max_u))
     extended_matrix = [optimal_row] + fuzzy_matrix
     optimality_values = []
     for row in extended_matrix:

@@ -2,32 +2,36 @@
     "last_csv": "uploads\\sppk.csv",
     "criteria": {
         "price": {
-            "type": "Benefit",
+            "type": "Cost",
             "weight": 0.2
         },
-        "has_5g": {
-            "type": "Benefit",
-            "weight": 0.05
-        },
-        "processor_speed": {
-            "type": "Benefit",
-            "weight": 0.05
-        },
-        "battery_capacity": {
-            "type": "Benefit",
-            "weight": 0.2
-        },
-        "ram_capacity": {
-            "type": "Benefit",
-            "weight": 0.25
-        },
-        "internal_memory": {
+        "num_cores": {
             "type": "Benefit",
             "weight": 0.1
         },
-        "primary_camera_rear": {
+        "processor_speed": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "battery_capacity": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "ram_capacity": {
+            "type": "Benefit",
+            "weight": 0.2
+        },
+        "internal_memory": {
             "type": "Benefit",
             "weight": 0.15
+        },
+        "primary_camera_rear": {
+            "type": "Benefit",
+            "weight": 0.1
+        },
+        "primary_camera_front": {
+            "type": "Benefit",
+            "weight": 0.05
         }
     }
 }
