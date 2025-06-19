@@ -67,11 +67,10 @@ def get_fuzzy_matrix(df, criteria_config):
     return fuzzy_data, linguistic_data
 
 # ---------------------------------------------------------------------------
-# BAGIAN 2: IMPLEMENTASI FUZZY SAW & ARAS (Tidak ada perubahan)
+# BAGIAN 2: IMPLEMENTASI FUZZY SAW & ARAS (Diperbarui)
 # ---------------------------------------------------------------------------
 def fuzzy_saw(fuzzy_matrix, weights):
     weighted_matrix = [[tfn * w for tfn, w in zip(row, weights)] for row in fuzzy_matrix]
-    # Koreksi: Penjumlahan TFN perlu inisialisasi TFN(0,0,0)
     final_scores = []
     for row in weighted_matrix:
         score = TFN(0,0,0)
@@ -81,13 +80,15 @@ def fuzzy_saw(fuzzy_matrix, weights):
     return [s.defuzzify() for s in final_scores], final_scores
 
 def fuzzy_aras(fuzzy_matrix, weights):
+    # DIPERBARUI: Menentukan baris optimal dari data yang ada, bukan statis TFN(1,1,1)
     optimal_row = []
-    for j in range(len(weights)):
-        col = [row[j] for row in fuzzy_matrix]
-        max_l = max(tfn.l for tfn in col)
-        max_m = max(tfn.m for tfn in col)
-        max_u = max(tfn.u for tfn in col)
+    for j in range(len(weights)): # Untuk setiap kriteria
+        col_values = [row[j] for row in fuzzy_matrix]
+        max_l = max(tfn.l for tfn in col_values)
+        max_m = max(tfn.m for tfn in col_values)
+        max_u = max(tfn.u for tfn in col_values)
         optimal_row.append(TFN(max_l, max_m, max_u))
+    
     extended_matrix = [optimal_row] + fuzzy_matrix
     optimality_values = []
     for row in extended_matrix:
@@ -158,56 +159,47 @@ def dashboard():
                     weights_list = weights_list / weights_list.sum()
 
                 fuzzy_matrix, linguistic_matrix = get_fuzzy_matrix(decision_matrix_df, criteria_config)
+                
+                # Membuat DataFrame tampilan untuk matriks keputusan
+                decision_matrix_display_df = decision_matrix_df.copy()
+                decision_matrix_display_df.insert(0, 'No.', range(1, len(decision_matrix_display_df) + 1))
+                # DIPERBARUI: Paksa kolom 'No.' menjadi integer
+                decision_matrix_display_df['No.'] = decision_matrix_display_df['No.'].astype(int)
+                
+                # Membuat DataFrame tampilan untuk matriks linguistik
                 linguistic_df = pd.DataFrame(linguistic_matrix, columns=selected_criteria, index=df_raw.index)
+                linguistic_display_df = linguistic_df.copy()
+                linguistic_display_df.insert(0, 'No.', range(1, len(linguistic_display_df) + 1))
+                linguistic_display_df['No.'] = linguistic_display_df['No.'].astype(int)
+
 
                 saw_scores, _ = fuzzy_saw(fuzzy_matrix, weights_list)
                 df_saw = pd.DataFrame({
-                    'Nama HP': df_raw['model'],  # Ganti "Nama" jika nama kolom berbeda
+                    'Nama HP': df_raw['model'], # Gunakan kolom 'Model' atau nama yang sesuai
                     'Skor Defuzzifikasi': saw_scores
                 }).sort_values('Skor Defuzzifikasi', ascending=False)
                 df_saw['Peringkat'] = range(1, len(df_saw) + 1)
 
                 aras_scores, _ = fuzzy_aras(fuzzy_matrix, weights_list)
                 df_aras = pd.DataFrame({
-                    'Nama HP': df_raw['model'],  # Sesuaikan juga nama kolomnya
+                    'Nama HP': df_raw['model'], # Sesuaikan juga nama kolomnya
                     'Derajat Utilitas Defuzzifikasi': aras_scores
                 }).sort_values('Derajat Utilitas Defuzzifikasi', ascending=False)
                 df_aras['Peringkat'] = range(1, len(df_aras) + 1)
                 
                 results = {
-                    "pratinjau": {
-                        "data": paginate(df_raw, pratinjau_page),
-                        "page": pratinjau_page,
-                        "total_pages": ceil(len(df_raw) / ITEMS_PER_PAGE)
-                    },
-                    "keputusan": {
-                        "data": paginate(decision_matrix_df.reset_index(), keputusan_page),
-                        "page": keputusan_page,
-                        "total_pages": ceil(len(decision_matrix_df) / ITEMS_PER_PAGE)
-                    },
-                    "linguistik": {
-                        "data": paginate(linguistic_df.reset_index(), linguistik_page),
-                        "page": linguistik_page,
-                        "total_pages": ceil(len(linguistic_df) / ITEMS_PER_PAGE)
-                    },
-                    "saw": {
-                        "data": paginate(df_saw, saw_page),
-                        "page": saw_page,
-                        "total_pages": ceil(len(df_saw) / ITEMS_PER_PAGE)
-                    },
-                    "aras": {
-                        "data": paginate(df_aras, aras_page),
-                        "page": aras_page,
-                        "total_pages": ceil(len(df_aras) / ITEMS_PER_PAGE)
-                    },
+                    "pratinjau": {"data": paginate(df_raw, pratinjau_page), "page": pratinjau_page, "total_pages": ceil(len(df_raw)/ITEMS_PER_PAGE)},
+                    "keputusan": {"data": paginate(decision_matrix_display_df, keputusan_page), "page": keputusan_page, "total_pages": ceil(len(decision_matrix_display_df)/ITEMS_PER_PAGE)},
+                    "linguistik": {"data": paginate(linguistic_display_df, linguistik_page), "page": linguistik_page, "total_pages": ceil(len(linguistic_display_df)/ITEMS_PER_PAGE)},
+                    "saw": {"data": paginate(df_saw, saw_page), "page": saw_page, "total_pages": ceil(len(df_saw)/ITEMS_PER_PAGE)},
+                    "aras": {"data": paginate(df_aras, aras_page), "page": aras_page, "total_pages": ceil(len(df_aras)/ITEMS_PER_PAGE)},
                 }
-
-
         except Exception as e:
             flash(f"Terjadi error saat memproses file: {e}", "danger")
 
     return render_template('dashboard.html', config=config, results=results, current_page='dashboard')
 
+# Rute untuk settings tidak berubah, tetap sama seperti sebelumnya
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     config = load_config()
@@ -225,7 +217,6 @@ def settings():
         
         if action == 'select_criteria':
             selected_cols = request.form.getlist('selected_criteria')
-            # Reset kriteria, simpan hanya yang dipilih dengan nilai default
             config['criteria'] = {col: {"type": "Benefit", "weight": 0} for col in selected_cols}
             save_config(config)
             flash('Kriteria berhasil dipilih. Sekarang tentukan tipe dan bobotnya.', 'info')
@@ -234,7 +225,6 @@ def settings():
         elif action == 'save_settings':
             new_criteria_settings = {}
             total_weight = 0
-            # Ambil kriteria yang sudah ada di config untuk diproses
             current_criteria = config.get('criteria', {})
             for col_name in current_criteria.keys():
                 weight_str = request.form.get(f'weight_{col_name}', '0')
@@ -257,6 +247,7 @@ def settings():
             return redirect(url_for('dashboard'))
 
     return render_template('settings.html', config=config, available_columns=available_columns, current_page='settings')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
